@@ -1,10 +1,11 @@
 import { Hono } from "hono";
 
-import { generateText, streamText, type CoreMessage } from "ai";
+import { generateObject, generateText, streamText, type CoreMessage } from "ai";
 import { google } from "@ai-sdk/google";
 import { cors } from "hono/cors";
 import { stream } from "hono/streaming";
 import myTool from "./tool";
+import { z } from "zod";
 
 const gemini = google("gemini-1.5-flash");
 
@@ -17,12 +18,7 @@ app.post("/api/prompt", async (ctx) => {
 
   const res = await generateText({
     model: gemini,
-    messages: [
-      {
-        content: textMessage,
-        role: "user",
-      },
-    ],
+    prompt: textMessage,
   });
 
   return ctx.text(res.text);
@@ -73,6 +69,27 @@ app.post("/api/tool-prompt", async (ctx) => {
   });
 
   return ctx.text(res.text);
+});
+
+app.post("/api/recipe", async (ctx) => {
+  const prompt = await ctx.req.text();
+
+  const res = await generateObject({
+    model: gemini,
+    prompt,
+    schema: z.object({
+      name: z.string().describe("Name for the recipe"),
+      ingridients: z.array(
+        z.object({
+          name: z.string(),
+          quantity: z.string(),
+        }),
+      ),
+      steps: z.array(z.string()),
+    }),
+  });
+
+  return ctx.json(res.object);
 });
 
 export default app;
