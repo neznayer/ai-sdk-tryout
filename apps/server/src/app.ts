@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import { generateText } from "ai";
+import { generateText, type CoreMessage } from "ai";
 import { google } from "@ai-sdk/google";
 
 const gemini = google("gemini-1.5-flash");
@@ -25,6 +25,17 @@ app.post("/api/prompt", async (ctx) => {
   });
 
   return ctx.text(res.text);
+});
+
+app.post("/api/chat", async (ctx) => {
+  const messages: CoreMessage[] = await ctx.req.json();
+
+  const res = await generateText({
+    model: gemini,
+    messages,
+  });
+
+  return ctx.json(res.response.messages);
 });
 
 export default app;
