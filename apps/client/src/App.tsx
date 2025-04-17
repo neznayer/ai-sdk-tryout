@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type CoreMessage = {
   role: "user" | "assistant" | "system";
@@ -12,9 +12,10 @@ type ResponseMessage = {
 
 function App() {
   return (
-    <main>
+    <main className=" h-screen flex flex-col gap-2">
       <Prompt />
       <Chat />
+      <StreamingPrompt />
     </main>
   );
 }
@@ -96,8 +97,8 @@ function Chat() {
   }
 
   return (
-    <div className=" h-52 bg-blue-50 rounded p-2">
-      <div className=" flex p-2 bg-slate-100 flex-col gap-1">
+    <div className=" h-52 bg-blue-50 rounded p-2 flex flex-col">
+      <div className=" flex p-2 bg-slate-100 flex-col gap-1 flex-1 overflow-auto">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -120,6 +121,71 @@ function Chat() {
         >
           Submit
         </button>
+      </div>
+    </div>
+  );
+}
+
+function StreamingPrompt() {
+  const [prompt, setPrompt] = useState("");
+  const [answer, setAnswer] = useState("");
+
+  async function handleSubmit() {
+    setAnswer("");
+    const res = await fetch("http://localhost:3000/api/streaming-prompt", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain",
+      },
+      body: prompt,
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const reader = res.body!.getReader();
+
+    const decoder = new TextDecoder();
+
+    let done = false;
+    while (!done) {
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      const chunkValue = decoder.decode(value);
+      const match = chunkValue.match(/0:"(.*)"/)?.[1];
+      if (match) {
+        setAnswer((prev) => prev + match);
+      }
+    }
+
+    reader.releaseLock();
+  }
+
+  const parsedNewLines = useMemo(() => {
+    return answer.split("\\n");
+  }, [answer]);
+
+  return (
+    <div className=" bg-sky-100 p-2 flex flex-col">
+      <div>
+        <input
+          className="p-1 border border-slate-300"
+          type="text"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+        />
+        <button
+          onClick={handleSubmit}
+          className="p-1 bg-blue-500 text-white rounded"
+        >
+          Submit
+        </button>
+      </div>
+      <div>
+        {parsedNewLines.map((line, index) => (
+          <div key={index}>{line}</div>
+        ))}
       </div>
     </div>
   );
