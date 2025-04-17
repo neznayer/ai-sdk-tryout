@@ -1,0 +1,44 @@
+[
+  {
+    "name": "MIT",
+    "country": "USA",
+    "students": 10000,
+    "location": "Cambridge, Massachusetts",
+    "website": "https://mit.edu"
+  },
+  {
+    "name": "Stanford University",
+    "country": "USA",
+    "students": 15000,
+    "location": "Stanford, California",
+    "website": "https://stanford.edu"
+  },
+  {
+    "name": "Harvard University",
+    "country": "USA",
+    "students": 20000,
+    "location": "Cambridge, Massachusetts",
+    "website": "https://harvard.edu"
+  },
+  {
+    "name": "University of California, Berkeley",
+    "country": "USA",
+    "students": 30000,
+    "location": "Berkeley, California",
+    "website": "https://berkeley.edu"
+  },
+  {
+    "name": "Moscow Power Engineering Institute",
+    "country": "Russia",
+    "students": 12000,
+    "location": "Moscow, Russia",
+    "website": "https://mpei.ru"
+  },
+  {
+    "name": "University of Oxford",
+    "country": "UK",
+    "students": 20000,
+    "location": "Oxford, England",
+    "website": "https://ox.ac.uk"
+  }
+]

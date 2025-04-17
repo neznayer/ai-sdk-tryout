@@ -11,10 +11,6 @@ const app = new Hono();
 
 app.use("/api/*", cors());
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
-
 app.post("/api/prompt", async (ctx) => {
   const textMessage = await ctx.req.text();
 
