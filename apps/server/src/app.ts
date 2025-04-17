@@ -2,10 +2,13 @@ import { Hono } from "hono";
 
 import { generateText, type CoreMessage } from "ai";
 import { google } from "@ai-sdk/google";
+import { cors } from "hono/cors";
 
 const gemini = google("gemini-1.5-flash");
 
 const app = new Hono();
+
+app.use("/api/*", cors());
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
