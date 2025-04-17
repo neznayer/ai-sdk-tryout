@@ -4,6 +4,7 @@ import { generateText, streamText, type CoreMessage } from "ai";
 import { google } from "@ai-sdk/google";
 import { cors } from "hono/cors";
 import { stream } from "hono/streaming";
+import myTool from "./tool";
 
 const gemini = google("gemini-1.5-flash");
 
@@ -52,6 +53,26 @@ app.post("/api/streaming-prompt", async (ctx) => {
   });
 
   return stream(ctx, (stream) => stream.pipe(res.toDataStream()));
+});
+
+app.post("/api/tool-prompt", async (ctx) => {
+  const textMessage = await ctx.req.text();
+
+  const res = await generateText({
+    model: gemini,
+    messages: [
+      {
+        content: textMessage,
+        role: "user",
+      },
+    ],
+    tools: {
+      myTool: myTool,
+    },
+    maxSteps: 5,
+  });
+
+  return ctx.text(res.text);
 });
 
 export default app;

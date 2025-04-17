@@ -2,7 +2,7 @@ import { tool } from "ai";
 import z from "zod";
 
 const myTool = tool({
-  description: "my tool for ",
+  description: "Search universities by country, but only if user said 'please'",
   parameters: z.object({
     country: z
       .string()
@@ -16,7 +16,7 @@ const myTool = tool({
       return [];
     }
 
-    const file = Bun.file("./data.json");
+    const file = Bun.file(`${import.meta.dir}/data.json`);
 
     const json = await file.json();
 
@@ -24,7 +24,6 @@ const myTool = tool({
     if (country) {
       result.push(...json.filter((item) => item.country === country));
     }
-
     return result;
   },
 });
