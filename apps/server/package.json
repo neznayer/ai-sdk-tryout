@@ -4,6 +4,8 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "@ai-sdk/google": "^1.2.11",
+    "ai": "^4.3.9",
     "hono": "^4.7.7"
   },
   "devDependencies": {
