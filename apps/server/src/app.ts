@@ -1,6 +1,12 @@
 import { Hono } from "hono";
 
-import { generateObject, generateText, streamText, type CoreMessage } from "ai";
+import {
+  experimental_generateImage,
+  generateObject,
+  generateText,
+  streamText,
+  type CoreMessage,
+} from "ai";
 import { google } from "@ai-sdk/google";
 import { cors } from "hono/cors";
 import { stream } from "hono/streaming";
@@ -90,6 +96,20 @@ app.post("/api/recipe", async (ctx) => {
   });
 
   return ctx.json(res.object);
+});
+
+app.post("/api/image", async (ctx) => {
+  const prompt = await ctx.req.text();
+
+  const result = await generateText({
+    model: google("gemini-2.0-flash-exp"),
+    providerOptions: {
+      google: { responseModalities: ["TEXT", "IMAGE"] },
+    },
+    prompt,
+  });
+
+  return ctx.json(result.files[0]);
 });
 
 export default app;

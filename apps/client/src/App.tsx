@@ -16,6 +16,7 @@ function App() {
       <Prompt />
       <Chat />
       <StreamingPrompt />
+      <ImageGenerator />
     </main>
   );
 }
@@ -187,6 +188,53 @@ function StreamingPrompt() {
           <div key={index}>{line}</div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function ImageGenerator() {
+  const [prompt, setPrompt] = useState("");
+  const [image, setImage] = useState("");
+
+  async function handleSubmit() {
+    setImage("");
+    const res = await fetch("http://localhost:3000/api/image", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain",
+      },
+      body: prompt,
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const base64Image = (await res.json()) as {
+      base64Data: string;
+      mimeType: string;
+    };
+
+    setImage(`data:${base64Image.mimeType};base64,${base64Image.base64Data}`);
+  }
+
+  return (
+    <div className=" bg-sky-100 p-2 flex flex-col">
+      <div>
+        <input
+          className="p-1 border border-slate-300"
+          type="text"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+        />
+        <button
+          onClick={handleSubmit}
+          className="p-1 bg-blue-500 text-white rounded"
+        >
+          Submit
+        </button>
+      </div>
+      <div>{image && <img src={image} alt="Generated Image" />}</div>
     </div>
   );
 }
